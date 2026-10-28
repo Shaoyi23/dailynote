@@ -60,6 +60,9 @@ Copy `.env.example` to `.env.local` and set your production URL when you deploy.
    "i also write blog" line links to the blog index.
 3. **Blog posts** — add or edit entries in [`src/data/posts.ts`](src/data/posts.ts).
    The list page, article routes, and sitemap are generated from this array.
+   Add an optional `translation` object (`lang: "zh-CN"`, title, description,
+   reading time, content) to show an `EN / 中文` switch on that article. The
+   default reading language stays English.
 4. **Avatar** — replace [`public/avatar.svg`](public/avatar.svg) with a photo or
    your own illustration. If you use a PNG/JPG, update the `src` in
    [`src/components/avatar.tsx`](src/components/avatar.tsx), remove
@@ -85,6 +88,7 @@ src/
     opengraph-image.tsx      dynamic social image
   components/
     ambient-background.tsx
+    article-view.tsx         article body, code blocks, EN/中文 switch
     avatar.tsx
     back-link.tsx
     icons.tsx                hand-drawn SVG brand/tech marks

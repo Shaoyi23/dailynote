@@ -164,14 +164,40 @@ i also write blog
 
 支持的内容块类型：
 
-- `paragraph`
-- `heading`
-- `quote`
-- `list`
+- `paragraph`：正文段落
+- `heading`：小标题
+- `quote`：引用
+- `list`：无序列表
+- `code`：带行号和轻量语法高亮的代码块
+- `callout`：用于答案、提示等强调内容
 
 保存后，博客列表、文章静态路由和 `sitemap.xml` 会自动更新，不需要额外配置。
 
-### 4. 替换头像
+### 4. 给文章增加中英切换
+
+在文章对象中加入可选的 `translation` 字段，详情页就会自动显示 `EN / 中文` 切换按钮。默认仍然显示英文：
+
+```ts
+{
+  slug: "my-new-post",
+  title: "my new post",
+  // ...英文内容
+  translation: {
+    lang: "zh-CN",
+    label: "中文",
+    title: "我的新文章",
+    description: "中文摘要。",
+    readingTime: "4 分钟阅读",
+    content: [
+      { type: "paragraph", text: "中文正文段落。" },
+    ],
+  },
+}
+```
+
+当前 `why var logs 3, 3, 3` 这篇文章已经带有完整的中文翻译，可以作为示例。没有 `translation` 字段的文章不会显示语言切换按钮。
+
+### 5. 替换头像
 
 替换 [`public/avatar.svg`](public/avatar.svg) 即可。如果使用 JPG/PNG：
 
@@ -179,7 +205,7 @@ i also write blog
 2. 修改 [`src/components/avatar.tsx`](src/components/avatar.tsx) 中的 `src`。
 3. 移除 `unoptimized`，并补上合适的 `alt` 文案。
 
-### 5. 调整配色
+### 6. 调整配色
 
 配色集中在 [`src/app/globals.css`](src/app/globals.css) 顶部的 `:root`：
 
@@ -190,7 +216,7 @@ i also write blog
 
 背景的柔和渐变和颗粒纹理也在同一个文件里，可按需调整透明度或色相。
 
-### 6. 域名与 SEO
+### 7. 域名与 SEO
 
 复制 `.env.example` 为 `.env.local`：
 

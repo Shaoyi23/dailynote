@@ -8,7 +8,18 @@ export type PostBlock =
   | { type: "paragraph"; text: string }
   | { type: "heading"; text: string }
   | { type: "quote"; text: string }
-  | { type: "list"; items: string[] };
+  | { type: "list"; items: string[] }
+  | { type: "code"; code: string; language?: string }
+  | { type: "callout"; label: string; text: string };
+
+export type PostTranslation = {
+  lang: "zh-CN";
+  label: string;
+  title: string;
+  description: string;
+  readingTime: string;
+  content: PostBlock[];
+};
 
 export type Post = {
   slug: string;
@@ -17,9 +28,248 @@ export type Post = {
   date: string;
   readingTime: string;
   content: PostBlock[];
+  translation?: PostTranslation;
 };
 
 export const posts: Post[] = [
+  {
+    slug: "why-var-logs-3-3-3",
+    title: "why var logs 3, 3, 3",
+    description:
+      "A classic JavaScript quiz, unpacked: scope, closures, and the event loop behind three little 3s.",
+    date: "2026-10-28",
+    readingTime: "6 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "There is a famous JavaScript quiz that looks like a trap: a for loop with var, three timers, and one question. What gets logged? The choices usually look something like [0, 1, 2], 0, 1, 2, 3, 3, 3, or an infinite loop.",
+      },
+      {
+        type: "code",
+        language: "js",
+        code: `for (var i = 0; i < 3; i++) {
+  setTimeout(() => {
+    console.log(i);
+  }, 1000);
+}`,
+      },
+      {
+        type: "paragraph",
+        text: "If your first instinct is 0, 1, 2, you are thinking about the value of i when each callback is created. That is a reasonable guess, but JavaScript is not saving a snapshot of that value for the timer.",
+      },
+      {
+        type: "heading",
+        text: "the answer",
+      },
+      {
+        type: "callout",
+        label: "correct answer",
+        text: "C — 3, 3, 3",
+      },
+      {
+        type: "paragraph",
+        text: "The loop finishes synchronously before any timer fires. By the time the callbacks run, the single var i has already reached 3. Each callback prints 3 on its own line, so the final output is three 3s.",
+      },
+      {
+        type: "heading",
+        text: "one binding, three closures",
+      },
+      {
+        type: "paragraph",
+        text: "var is function-scoped, or global at the top level. That means all three callbacks close over the same i. The closure does not capture the number 0, 1, or 2. It captures the variable itself. When the callback finally reads i, the loop is over and the value is 3.",
+      },
+      {
+        type: "quote",
+        text: "The timer does not capture the value. It captures the variable.",
+      },
+      {
+        type: "heading",
+        text: "the event loop does the rest",
+      },
+      {
+        type: "paragraph",
+        text: "setTimeout schedules each callback and returns immediately. The loop runs to completion, i becomes 3, and the condition fails. Only then does the event loop process the timers. All three callbacks see i === 3.",
+      },
+      {
+        type: "paragraph",
+        text: "The 1000ms delay also does not create one second between each log. The callbacks are queued around the same time and then run one after another, so you see three 3s at almost the same moment.",
+      },
+      {
+        type: "heading",
+        text: "the let version",
+      },
+      {
+        type: "paragraph",
+        text: "Change var to let and the output becomes 0, 1, 2. In a for loop, let creates a new binding for each iteration. Each callback closes over its own iteration's binding, so the value is preserved.",
+      },
+      {
+        type: "code",
+        language: "js",
+        code: `for (let i = 0; i < 3; i++) {
+  setTimeout(() => {
+    console.log(i);
+  }, 1000);
+}`,
+      },
+      {
+        type: "heading",
+        text: "other ways to capture the value",
+      },
+      {
+        type: "paragraph",
+        text: "If you have to keep var, you can pass the current value into the callback explicitly. setTimeout accepts extra arguments and forwards them to the function.",
+      },
+      {
+        type: "code",
+        language: "js",
+        code: `for (var i = 0; i < 3; i++) {
+  setTimeout((value) => {
+    console.log(value);
+  }, 1000, i);
+}`,
+      },
+      {
+        type: "paragraph",
+        text: "An immediately invoked function expression can also create a new scope for each iteration, but let is usually clearer and easier to read.",
+      },
+      {
+        type: "heading",
+        text: "what to remember",
+      },
+      {
+        type: "list",
+        items: [
+          "var is function-scoped; let and const are block-scoped.",
+          "Closures capture bindings, not snapshots of values.",
+          "Timers run after the current synchronous code has finished.",
+          "A for loop with let creates a fresh binding on every iteration.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "The quiz is not really about setTimeout. It is about the gap between when code is written and when it actually runs. Once that gap is clear, a lot of asynchronous JavaScript starts to make sense.",
+      },
+    ],
+    translation: {
+      lang: "zh-CN",
+      label: "中文",
+      title: "为什么 var 输出了三次 3",
+      description:
+        "一道经典 JavaScript 面试题：从 var、闭包和事件循环理解为什么控制台会打印 3, 3, 3。",
+      readingTime: "6 分钟阅读",
+      content: [
+        {
+          type: "paragraph",
+          text: "这是 JavaScript 里一道很经典的题：一个使用 var 的 for 循环、三个定时器，以及一个问题——最后会打印什么？常见选项包括 [0, 1, 2]、0, 1, 2、3, 3, 3 和死循环。",
+        },
+        {
+          type: "code",
+          language: "js",
+          code: `for (var i = 0; i < 3; i++) {
+  setTimeout(() => {
+    console.log(i);
+  }, 1000);
+}`,
+        },
+        {
+          type: "paragraph",
+          text: "如果你的第一反应是 0, 1, 2，你关注的是创建回调时 i 的值。这个猜测很合理，但 JavaScript 并没有为定时器保存那一刻的数字快照。",
+        },
+        {
+          type: "heading",
+          text: "答案",
+        },
+        {
+          type: "callout",
+          label: "正确答案",
+          text: "C — 3, 3, 3",
+        },
+        {
+          type: "paragraph",
+          text: "循环会在任何一个定时器触发之前同步执行完毕。等到回调真正运行时，唯一的 var i 已经变成了 3。每个回调各打印一行 3，所以最终输出是三个 3。",
+        },
+        {
+          type: "heading",
+          text: "一个变量绑定，三个闭包",
+        },
+        {
+          type: "paragraph",
+          text: "var 是函数作用域，在顶层则是全局作用域。因此三个回调闭包引用的是同一个 i。闭包没有捕获 0、1、2 这些值，它捕获的是变量本身。等回调真正读取 i 时，循环已经结束，值是 3。",
+        },
+        {
+          type: "quote",
+          text: "定时器没有捕获值，它捕获的是变量。",
+        },
+        {
+          type: "heading",
+          text: "剩下的交给事件循环",
+        },
+        {
+          type: "paragraph",
+          text: "setTimeout 只是把回调交给定时器，然后立刻返回。循环顺利跑完，i 增加到 3 后条件不成立。直到这时，事件循环才处理到期的定时器。三个回调看到的 i 都是 3。",
+        },
+        {
+          type: "paragraph",
+          text: "1000ms 也不是每次打印之间间隔 1 秒。三个回调差不多在同一时间入队，然后依次执行，所以三个 3 几乎同时出现。",
+        },
+        {
+          type: "heading",
+          text: "换成 let 之后",
+        },
+        {
+          type: "paragraph",
+          text: "把 var 改成 let，输出就会变成 0, 1, 2。在 for 循环中，let 会为每一次迭代创建新的绑定，每个回调捕获自己那一轮的 i，因此值被保留下来。",
+        },
+        {
+          type: "code",
+          language: "js",
+          code: `for (let i = 0; i < 3; i++) {
+  setTimeout(() => {
+    console.log(i);
+  }, 1000);
+}`,
+        },
+        {
+          type: "heading",
+          text: "其他捕获当前值的方式",
+        },
+        {
+          type: "paragraph",
+          text: "如果必须使用 var，可以把当前值显式传给回调。setTimeout 支持传入额外参数，这些参数会原样传给回调函数。",
+        },
+        {
+          type: "code",
+          language: "js",
+          code: `for (var i = 0; i < 3; i++) {
+  setTimeout((value) => {
+    console.log(value);
+  }, 1000, i);
+}`,
+        },
+        {
+          type: "paragraph",
+          text: "用立即执行函数（IIFE）也可以为每一轮循环创建新作用域，但通常写法不如 let 直观。",
+        },
+        {
+          type: "heading",
+          text: "记住这几件事",
+        },
+        {
+          type: "list",
+          items: [
+            "var 是函数作用域，let 和 const 是块级作用域。",
+            "闭包捕获的是变量绑定，而不是值的快照。",
+            "定时器回调要等当前同步代码执行完毕后才会运行。",
+            "for 循环里的 let 会为每一轮迭代创建独立绑定。",
+          ],
+        },
+        {
+          type: "paragraph",
+          text: "这道题真正考的不是 setTimeout，而是代码写下的时间和它真正执行的时间之间的差距。理解这个差距之后，很多异步 JavaScript 问题都会变得清晰。",
+        },
+      ],
+    },
+  },
   {
     slug: "the-first-five-seconds",
     title: "the first five seconds",

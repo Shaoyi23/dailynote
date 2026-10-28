@@ -66,6 +66,13 @@
     text-transform: lowercase;
   }
 
+  code,
+  pre,
+  kbd,
+  samp {
+    text-transform: none;
+  }
+
   ::selection {
     background: var(--selection);
     color: var(--ink);
