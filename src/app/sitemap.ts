@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { labExperiments } from "@/data/lab";
 import { posts } from "@/data/posts";
 import { siteConfig } from "@/data/site";
 
@@ -9,6 +10,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "yearly",
     priority: 0.7,
   }));
+
+  const labEntries: MetadataRoute.Sitemap = labExperiments.map(
+    (experiment) => ({
+      url: `${siteConfig.url}/ux-lab/${experiment.slug}`,
+      lastModified: new Date(`${experiment.date}T12:00:00Z`),
+      changeFrequency: "yearly",
+      priority: 0.6,
+    }),
+  );
 
   return [
     {
@@ -24,5 +34,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     ...postEntries,
+    {
+      url: `${siteConfig.url}/ux-lab`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    ...labEntries,
   ];
 }

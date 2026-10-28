@@ -24,9 +24,11 @@ social links, and blog posts are placeholders. Replace them before deploying.
 
 | Route | Description |
 | --- | --- |
-| `/` | Homepage: intro, links, blog entry point, social links |
+| `/` | Homepage: intro, links, blog and UX lab entry points, social links |
 | `/blog` | Blog index, modelled on the reference site's list layout |
 | `/blog/[slug]` | Article page with prose and more posts |
+| `/ux-lab` | Grid of interactive UX experiments, modelled on the reference lab |
+| `/ux-lab/[slug]` | Live experiment with notes, source link, and more experiments |
 
 ## Run it
 
@@ -57,20 +59,26 @@ Copy `.env.example` to `.env.local` and set your production URL when you deploy.
    where the name, location, email, description, and social URLs live. The
    defaults are placeholders (`your-handle`, `yourdomain.com`).
 2. **Homepage copy** — edit [`src/app/page.tsx`](src/app/page.tsx). The
-   "i also write blog" line links to the blog index.
+   "i also write blog" line links to the blog index, and the UX lab phrase
+   links to `/ux-lab`.
 3. **Blog posts** — add or edit entries in [`src/data/posts.ts`](src/data/posts.ts).
    The list page, article routes, and sitemap are generated from this array.
    Add an optional `translation` object (`lang: "zh-CN"`, title, description,
    reading time, content) to show an `EN / 中文` switch on that article. The
    default reading language stays English.
-4. **Avatar** — replace [`public/avatar.svg`](public/avatar.svg) with a photo or
-   your own illustration. If you use a PNG/JPG, update the `src` in
-   [`src/components/avatar.tsx`](src/components/avatar.tsx), remove
-   `unoptimized`, and set a useful `alt`.
-5. **Colors** — adjust the CSS variables at the top of
+4. **UX lab** — mock experiment copy lives in [`src/data/lab.ts`](src/data/lab.ts).
+   Interactive demos and card previews are in
+   [`src/components/lab-demos.tsx`](src/components/lab-demos.tsx) and
+   [`src/components/lab-preview.tsx`](src/components/lab-preview.tsx). Adding a
+   data entry with an existing `demo` kind is enough to create a new page.
+5. **Avatar** — [`public/cartonAvator.png`](public/cartonAvator.png) is used by
+   [`src/components/avatar.tsx`](src/components/avatar.tsx). Replace that file,
+   or update the `src` if you rename it. Next.js optimizes the 1254px source into
+   a small WebP for the 52px avatar.
+6. **Colors** — adjust the CSS variables at the top of
    [`src/app/globals.css`](src/app/globals.css). The default palette is warm
    paper, sage, clay, dusty blue, and plum.
-6. **Production URL** — set `NEXT_PUBLIC_SITE_URL` (or change the fallback in
+7. **Production URL** — set `NEXT_PUBLIC_SITE_URL` (or change the fallback in
    `src/data/site.ts`) before deploying so canonical URLs, robots, and the
    sitemap point at the right domain.
 
@@ -84,6 +92,8 @@ src/
     page.tsx                 homepage content
     blog/page.tsx            blog index
     blog/[slug]/page.tsx     article page
+    ux-lab/page.tsx          experiment grid
+    ux-lab/[slug]/page.tsx   live experiment page
     icon.svg                 favicon
     opengraph-image.tsx      dynamic social image
   components/
@@ -92,6 +102,9 @@ src/
     avatar.tsx
     back-link.tsx
     icons.tsx                hand-drawn SVG brand/tech marks
+    lab-demos.tsx            six interactive UX experiments
+    lab-more-list.tsx        more-experiments list
+    lab-preview.tsx          static card previews
     pill-link.tsx
     post-list.tsx
     reveal.tsx               Motion entrance group
@@ -100,12 +113,13 @@ src/
   data/
     site.ts                  the one file to edit first
     posts.ts                 blog content
+    lab.ts                   mock UX lab content
   fonts/
     inter-latin.woff2        bundled variable font
     caveat-latin.woff2       bundled handwritten font
     OFL-*.txt                font licenses
 public/
-  avatar.svg                 replace with your portrait
+  cartonAvator.png           replace with your portrait
 ```
 
 ## Troubleshooting

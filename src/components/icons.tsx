@@ -20,6 +20,24 @@ export function ArrowLeftIcon(props: IconProps) {
   );
 }
 
+export function ArrowUpRightIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      {...props}
+    >
+      <path d="M6.25 17.75L17.75 6.25M8.5 6.25L17.75 6.25L17.75 15.5" />
+    </svg>
+  );
+}
+
 export function GitHubIcon(props: IconProps) {
   return (
     <svg

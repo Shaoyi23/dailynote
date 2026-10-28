@@ -13,13 +13,13 @@ export function Avatar() {
           className="absolute -inset-1.5 rounded-full bg-sage/15 opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-100"
         />
         <Image
-          src="/avatar.svg"
+          src="/cartonAvator.png"
           alt=""
           width={160}
           height={160}
+          sizes="52px"
           priority
-          unoptimized
-          className="relative size-full rounded-full object-cover ring-[3px] ring-canvas/85 shadow-[0_1px_2px_rgba(58,47,33,0.12),0_5px_14px_-8px_rgba(58,47,33,0.35)] transition-transform duration-500 ease-out group-hover:-rotate-2 group-hover:scale-[1.035]"
+          className="relative size-full rounded-full object-cover object-center ring-[3px] ring-canvas/85 shadow-[0_1px_2px_rgba(58,47,33,0.12),0_5px_14px_-8px_rgba(58,47,33,0.35)] transition-transform duration-500 ease-out group-hover:-rotate-2 group-hover:scale-[1.035]"
         />
         <span
           aria-hidden="true"

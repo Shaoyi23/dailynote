@@ -18,9 +18,11 @@
 
 | 路径 | 说明 |
 | --- | --- |
-| `/` | 首页：头像、自我介绍、技术 pill、博客入口、社交链接 |
+| `/` | 首页：头像、自我介绍、技术 pill、博客和 UX Lab 入口、社交链接 |
 | `/blog` | 博客列表，布局参考 sanyam.sh/blogs |
 | `/blog/[slug]` | 博客文章详情，包含正文和更多文章 |
+| `/ux-lab` | UX 组件实验列表，布局参考 sanyam.sh/lab |
+| `/ux-lab/[slug]` | 可交互的 UX 实验详情，包含说明、源码链接和更多实验 |
 
 ## 本地运行
 
@@ -90,7 +92,7 @@ npm run dev:clean
 ```text
 dailynote/
 ├─ public/
-│  └─ avatar.svg                 头像插画，可替换成自己的照片
+│  └─ cartonAvator.png           头像，可替换成自己的照片
 ├─ src/
 │  ├─ app/
 │  │  ├─ page.tsx                首页
@@ -100,14 +102,23 @@ dailynote/
 │  │  │  ├─ page.tsx             博客列表页
 │  │  │  └─ [slug]/
 │  │  │     └─ page.tsx          博客详情页
+│  │  ├─ ux-lab/
+│  │  │  ├─ page.tsx             UX 实验网格列表
+│  │  │  └─ [slug]/
+│  │  │     └─ page.tsx          可交互实验详情页
 │  │  ├─ opengraph-image.tsx     动态 OG 分享图
 │  │  ├─ sitemap.ts              自动生成 sitemap
 │  │  ├─ robots.ts               robots.txt
 │  │  └─ icon.svg                favicon
-│  ├─ components/                UI 组件
+│  ├─ components/
+│  │  ├─ lab-demos.tsx           6 个可交互 UX 组件
+│  │  ├─ lab-preview.tsx         列表卡片缩略预览
+│  │  ├─ lab-more-list.tsx       更多实验列表
+│  │  └─ ...                     其他 UI 组件
 │  ├─ data/
 │  │  ├─ site.ts                 个人信息、邮箱、社交链接
-│  │  └─ posts.ts                博客文章数据
+│  │  ├─ posts.ts                博客文章数据
+│  │  └─ lab.ts                  UX Lab mock 数据
 │  └─ fonts/
 │     ├─ inter-latin.woff2       本地 Inter 可变字体
 │     ├─ caveat-latin.woff2      本地 Caveat 手写字体
@@ -138,7 +149,7 @@ dailynote/
 i also write blog
 ```
 
-其中 **blog** 链接到 `/blog`。如果想改文案或链接位置，直接修改对应段落即可。
+其中 **blog** 链接到 `/blog`。介绍段落里的 **lab of UX experiments** 链接到 `/ux-lab`。如果想改文案或链接位置，直接修改对应段落即可。
 
 ### 3. 新增或编辑博客文章
 
@@ -197,15 +208,36 @@ i also write blog
 
 当前 `why var logs 3, 3, 3` 这篇文章已经带有完整的中文翻译，可以作为示例。没有 `translation` 字段的文章不会显示语言切换按钮。
 
-### 5. 替换头像
+### 5. UX Lab 与交互组件
 
-替换 [`public/avatar.svg`](public/avatar.svg) 即可。如果使用 JPG/PNG：
+UX Lab 目前使用 mock 数据，分为三层：
 
-1. 把图片放到 `public/`。
+- 实验文案：[`src/data/lab.ts`](src/data/lab.ts)
+- 可交互组件：[`src/components/lab-demos.tsx`](src/components/lab-demos.tsx)
+- 列表缩略预览：[`src/components/lab-preview.tsx`](src/components/lab-preview.tsx)
+
+新增实验时，在 `labExperiments` 中添加一个对象，并复用已有的 `demo` 类型即可自动生成列表卡片和 `/ux-lab/[slug]` 详情页。当前包含：
+
+- `tactile press`：按压手感的按钮
+- `hold to confirm`：长按进度环确认
+- `elastic toggle`：弹簧开关
+- `magnetic button`：跟随指针的磁吸按钮
+- `quiet focus`：浮动标签输入框
+- `stagger shelf`：依次展开的卡片架
+
+如果需要全新的交互类型，需要同时扩展 `LabDemoKind`、`lab-demos.tsx` 和 `lab-preview.tsx`。
+
+### 6. 替换头像
+
+首页当前使用 [`public/cartonAvator.png`](public/cartonAvator.png)，由 [`src/components/avatar.tsx`](src/components/avatar.tsx) 中的 `next/image` 自动优化成小尺寸 WebP。
+
+替换头像时：
+
+1. 把新图片放到 `public/`。
 2. 修改 [`src/components/avatar.tsx`](src/components/avatar.tsx) 中的 `src`。
-3. 移除 `unoptimized`，并补上合适的 `alt` 文案。
+3. 保持 `width` / `height` 为正方形，并按需调整 `sizes`。
 
-### 6. 调整配色
+### 7. 调整配色
 
 配色集中在 [`src/app/globals.css`](src/app/globals.css) 顶部的 `:root`：
 
@@ -216,7 +248,7 @@ i also write blog
 
 背景的柔和渐变和颗粒纹理也在同一个文件里，可按需调整透明度或色相。
 
-### 7. 域名与 SEO
+### 8. 域名与 SEO
 
 复制 `.env.example` 为 `.env.local`：
 

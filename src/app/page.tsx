@@ -112,9 +112,13 @@ export default function Home() {
                     tone="sky"
                   >
                     side projects
-                  </TextLink>
-                  , and i think the best interfaces are the ones you barely
-                  notice.
+                  </TextLink>{" "}
+                  and keep a{" "}
+                  <TextLink href="/ux-lab" tone="clay">
+                    lab of UX experiments
+                  </TextLink>{" "}
+                  — small interactions rebuilt to understand how they feel. i
+                  think the best interfaces are the ones you barely notice.
                 </p>
               </RevealItem>
 
