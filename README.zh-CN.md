@@ -23,6 +23,8 @@
 | `/blog/[slug]` | 博客文章详情，包含正文和更多文章 |
 | `/ux-lab` | UX 组件实验列表，布局参考 sanyam.sh/lab |
 | `/ux-lab/[slug]` | 可交互的 UX 实验详情，包含说明、源码链接和更多实验 |
+| `/track` | F1 赛道卡片列表 |
+| `/track/[slug]` | 可交互赛道地图、弯道探索与赛道故事 |
 
 ## 本地运行
 
@@ -106,6 +108,10 @@ dailynote/
 │  │  │  ├─ page.tsx             UX 实验网格列表
 │  │  │  └─ [slug]/
 │  │  │     └─ page.tsx          可交互实验详情页
+│  │  ├─ track/
+│  │  │  ├─ page.tsx             F1 赛道卡片列表
+│  │  │  └─ [slug]/
+│  │  │     └─ page.tsx          交互式赛道详情页
 │  │  ├─ opengraph-image.tsx     动态 OG 分享图
 │  │  ├─ sitemap.ts              自动生成 sitemap
 │  │  ├─ robots.ts               robots.txt
@@ -114,11 +120,14 @@ dailynote/
 │  │  ├─ lab-demos.tsx           6 个可交互 UX 组件
 │  │  ├─ lab-preview.tsx         列表卡片缩略预览
 │  │  ├─ lab-more-list.tsx       更多实验列表
+│  │  ├─ track-explorer.tsx      赛道 SVG、弯道标记与介绍卡
 │  │  └─ ...                     其他 UI 组件
 │  ├─ data/
 │  │  ├─ site.ts                 个人信息、邮箱、社交链接
 │  │  ├─ posts.ts                博客文章数据
-│  │  └─ lab.ts                  UX Lab mock 数据
+│  │  ├─ lab.ts                  UX Lab mock 数据
+│  │  ├─ tracks.ts               F1 赛道与弯道数据
+│  │  └─ f1-circuits-LICENSE.txt 赛道几何数据 MIT 许可证
 │  └─ fonts/
 │     ├─ inter-latin.woff2       本地 Inter 可变字体
 │     ├─ caveat-latin.woff2      本地 Caveat 手写字体
@@ -149,7 +158,7 @@ dailynote/
 i also write blog
 ```
 
-其中 **blog** 链接到 `/blog`。介绍段落里的 **lab of UX experiments** 链接到 `/ux-lab`。如果想改文案或链接位置，直接修改对应段落即可。
+其中 **blog** 链接到 `/blog`。介绍段落里的 **lab of UX experiments** 链接到 `/ux-lab`，F1 段落里的 **track guide** 链接到 `/track`。如果想改文案或链接位置，直接修改对应段落即可。
 
 ### 3. 新增或编辑博客文章
 
@@ -227,7 +236,19 @@ UX Lab 目前使用 mock 数据，分为三层：
 
 如果需要全新的交互类型，需要同时扩展 `LabDemoKind`、`lab-demos.tsx` 和 `lab-preview.tsx`。
 
-### 6. 替换头像
+### 6. F1 赛道指南
+
+赛道页面位于 `/track`，详情页位于 `/track/[slug]`。当前包含：
+
+- monza
+- zandvoort
+- red bull ring
+
+赛道、弯道、圈速和介绍数据都在 [`src/data/tracks.ts`](src/data/tracks.ts)。交互式 SVG 地图、hover 预览、点击选择、上/下一个弯、全部弯道快捷导航都在 [`src/components/track-explorer.tsx`](src/components/track-explorer.tsx)。
+
+赛道轮廓来自 [bacinger/f1-circuits](https://github.com/bacinger/f1-circuits)（MIT），许可证文件在 [`src/data/f1-circuits-LICENSE.txt`](src/data/f1-circuits-LICENSE.txt)。弯道标记和部分是用于展示的近似内容，不代表官方计时或赛道数据。
+
+### 7. 替换头像
 
 首页当前使用 [`public/cartonAvator.png`](public/cartonAvator.png)，由 [`src/components/avatar.tsx`](src/components/avatar.tsx) 中的 `next/image` 自动优化成小尺寸 WebP。
 
@@ -237,7 +258,7 @@ UX Lab 目前使用 mock 数据，分为三层：
 2. 修改 [`src/components/avatar.tsx`](src/components/avatar.tsx) 中的 `src`。
 3. 保持 `width` / `height` 为正方形，并按需调整 `sizes`。
 
-### 7. 调整配色
+### 8. 调整配色
 
 配色集中在 [`src/app/globals.css`](src/app/globals.css) 顶部的 `:root`：
 
@@ -248,7 +269,7 @@ UX Lab 目前使用 mock 数据，分为三层：
 
 背景的柔和渐变和颗粒纹理也在同一个文件里，可按需调整透明度或色相。
 
-### 8. 域名与 SEO
+### 9. 域名与 SEO
 
 复制 `.env.example` 为 `.env.local`：
 

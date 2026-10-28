@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { labExperiments } from "@/data/lab";
 import { posts } from "@/data/posts";
 import { siteConfig } from "@/data/site";
+import { tracks } from "@/data/tracks";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const postEntries: MetadataRoute.Sitemap = posts.map((post) => ({
@@ -19,6 +20,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     }),
   );
+
+  const trackEntries: MetadataRoute.Sitemap = tracks.map((track) => ({
+    url: `${siteConfig.url}/track/${track.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "yearly",
+    priority: 0.6,
+  }));
 
   return [
     {
@@ -41,5 +49,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     ...labEntries,
+    {
+      url: `${siteConfig.url}/track`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    ...trackEntries,
   ];
 }

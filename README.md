@@ -29,6 +29,8 @@ social links, and blog posts are placeholders. Replace them before deploying.
 | `/blog/[slug]` | Article page with prose and more posts |
 | `/ux-lab` | Grid of interactive UX experiments, modelled on the reference lab |
 | `/ux-lab/[slug]` | Live experiment with notes, source link, and more experiments |
+| `/track` | F1 circuit cards with illustrated layouts |
+| `/track/[slug]` | Interactive circuit map, corner explorer, and race notes |
 
 ## Run it
 
@@ -59,8 +61,8 @@ Copy `.env.example` to `.env.local` and set your production URL when you deploy.
    where the name, location, email, description, and social URLs live. The
    defaults are placeholders (`your-handle`, `yourdomain.com`).
 2. **Homepage copy** — edit [`src/app/page.tsx`](src/app/page.tsx). The
-   "i also write blog" line links to the blog index, and the UX lab phrase
-   links to `/ux-lab`.
+   "i also write blog" line links to the blog index, the UX lab phrase links to
+   `/ux-lab`, and the Formula 1 line links to `/track`.
 3. **Blog posts** — add or edit entries in [`src/data/posts.ts`](src/data/posts.ts).
    The list page, article routes, and sitemap are generated from this array.
    Add an optional `translation` object (`lang: "zh-CN"`, title, description,
@@ -71,14 +73,20 @@ Copy `.env.example` to `.env.local` and set your production URL when you deploy.
    [`src/components/lab-demos.tsx`](src/components/lab-demos.tsx) and
    [`src/components/lab-preview.tsx`](src/components/lab-preview.tsx). Adding a
    data entry with an existing `demo` kind is enough to create a new page.
-5. **Avatar** — [`public/cartonAvator.png`](public/cartonAvator.png) is used by
+5. **F1 track guide** — circuit content lives in
+   [`src/data/tracks.ts`](src/data/tracks.ts); the interactive map and corner
+   list are in [`src/components/track-explorer.tsx`](src/components/track-explorer.tsx).
+   Add a third or fourth circuit by following the `Track` type and reusing the
+   existing map UI.
+6. **Avatar** — [`public/cartonAvator.png`](public/cartonAvator.png) is used by
    [`src/components/avatar.tsx`](src/components/avatar.tsx). Replace that file,
    or update the `src` if you rename it. Next.js optimizes the 1254px source into
    a small WebP for the 52px avatar.
-6. **Colors** — adjust the CSS variables at the top of
+7. **Colors** — adjust the CSS variables at the top of
    [`src/app/globals.css`](src/app/globals.css). The default palette is warm
-   paper, sage, clay, dusty blue, and plum.
-7. **Production URL** — set `NEXT_PUBLIC_SITE_URL` (or change the fallback in
+   paper, sage, clay, dusty blue, and plum, with carbon/racing red/high-vis
+   tokens used by the track map.
+8. **Production URL** — set `NEXT_PUBLIC_SITE_URL` (or change the fallback in
    `src/data/site.ts`) before deploying so canonical URLs, robots, and the
    sitemap point at the right domain.
 
@@ -94,6 +102,8 @@ src/
     blog/[slug]/page.tsx     article page
     ux-lab/page.tsx          experiment grid
     ux-lab/[slug]/page.tsx   live experiment page
+    track/page.tsx           F1 circuit cards
+    track/[slug]/page.tsx    interactive circuit page
     icon.svg                 favicon
     opengraph-image.tsx      dynamic social image
   components/
@@ -110,10 +120,13 @@ src/
     reveal.tsx               Motion entrance group
     site-footer.tsx
     text-link.tsx
+    track-explorer.tsx       SVG circuit map + corner explorer
   data/
     site.ts                  the one file to edit first
     posts.ts                 blog content
     lab.ts                   mock UX lab content
+    tracks.ts                F1 circuit data
+    f1-circuits-LICENSE.txt  MIT license for circuit geometry
   fonts/
     inter-latin.woff2        bundled variable font
     caveat-latin.woff2       bundled handwritten font
@@ -148,3 +161,7 @@ host's environment settings.
 - The design deliberately avoids a nav bar and card grid, matching the
   reference's restraint.
 - No analytics or third-party scripts are included.
+- Circuit geometry is adapted from
+  [bacinger/f1-circuits](https://github.com/bacinger/f1-circuits) under the MIT
+  license. The turn positions and notes are illustrative rather than official
+  timing data.

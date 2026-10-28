@@ -135,6 +135,18 @@ export default function Home() {
 
               <RevealItem>
                 <p className="text-body text-pretty text-secondary">
+                  away from the keyboard, i’m a formula 1 fan. i love how a lap
+                  becomes a story — a late brake, a kerb, one corner that
+                  changes a race. i keep a small{" "}
+                  <TextLink href="/track" tone="clay">
+                    track guide
+                  </TextLink>{" "}
+                  for the circuits i can’t stop thinking about.
+                </p>
+              </RevealItem>
+
+              <RevealItem>
+                <p className="text-body text-pretty text-secondary">
                   i’m always up for a conversation about a good idea. if you’d
                   like to build something together,{" "}
                   <TextLink href={`mailto:${siteConfig.email}`} tone="clay">

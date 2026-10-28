@@ -15,6 +15,10 @@
   --color-clay: var(--clay);
   --color-sky: var(--sky);
   --color-plum: var(--plum);
+  --color-carbon: var(--carbon);
+  --color-racing: var(--racing);
+  --color-hivis: var(--hivis);
+  --color-track: var(--track-line);
 
   --text-body: 0.95rem;
   --text-body--line-height: 1.76;
@@ -36,6 +40,10 @@
   --clay: #996149;
   --sky: #5f7285;
   --plum: #7c6178;
+  --carbon: #1c1b19;
+  --racing: #d23b2e;
+  --hivis: #e6ef63;
+  --track-line: #f4ede0;
   --selection: #decfb4;
   color-scheme: light;
 }
@@ -142,6 +150,16 @@
     background-size: 180px 180px;
     mix-blend-mode: multiply;
     opacity: 0.045;
+  }
+
+  .track-surface {
+    background-color: var(--carbon);
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      rgba(244, 237, 224, 0.09) 1px,
+      transparent 0
+    );
+    background-size: 26px 26px;
   }
 
   .skip-link {
