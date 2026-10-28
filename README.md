@@ -17,7 +17,8 @@ social links, and blog posts are placeholders. Replace them before deploying.
 - **Tailwind CSS 4** — CSS-first theme tokens
 - **[Motion](https://motion.dev/)** — staggered entrance animation with reduced
   motion support
-- `next/font` — self-hosted Inter + Caveat
+- `next/font/local` — bundled Inter + Caveat WOFF2 files, no Google Fonts
+  request at build or runtime
 
 ## Pages
 
@@ -42,6 +43,7 @@ npm run build      # production build
 npm run start      # production server
 npm run lint       # eslint
 npm run typecheck  # tsc --noEmit
+npm run dev:clean  # clear .next, then start the dev server
 ```
 
 The project uses npm. If your global npm cache has permission issues, pass a
@@ -94,9 +96,25 @@ src/
   data/
     site.ts                  the one file to edit first
     posts.ts                 blog content
+  fonts/
+    inter-latin.woff2        bundled variable font
+    caveat-latin.woff2       bundled handwritten font
+    OFL-*.txt                font licenses
 public/
   avatar.svg                 replace with your portrait
 ```
+
+## Troubleshooting
+
+- **`Failed to load SWC binary for darwin/arm64`** — the platform-specific
+  Next.js compiler package is incomplete. Reinstall it with
+  `rm -rf node_modules/@next/swc-darwin-arm64 && npm install`, or do a clean
+  install with `rm -rf node_modules .next && npm ci`.
+- **`localhost:3000` keeps loading** — an old dev process may still own the port.
+  Check `lsof -nP -iTCP:3000 -sTCP:LISTEN`, stop the stale PID, then run
+  `npm run dev:clean`.
+- **Fonts** — Inter and Caveat are committed under `src/fonts/`, so builds do not
+  depend on access to Google Fonts.
 
 ## Deploy
 

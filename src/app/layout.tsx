@@ -1,18 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Caveat, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import { siteConfig } from "@/data/site";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
+const inter = localFont({
+  src: "../fonts/inter-latin.woff2",
   variable: "--font-inter",
   display: "swap",
+  weight: "100 900",
+  style: "normal",
+  adjustFontFallback: "Arial",
 });
 
-const caveat = Caveat({
-  subsets: ["latin"],
+const caveat = localFont({
+  src: "../fonts/caveat-latin.woff2",
   variable: "--font-caveat",
   display: "swap",
+  weight: "400 700",
+  style: "normal",
+  adjustFontFallback: false,
 });
 
 export const metadata: Metadata = {

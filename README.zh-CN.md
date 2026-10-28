@@ -12,7 +12,7 @@
 - **React 19** + **TypeScript**
 - **Tailwind CSS 4** — CSS-first 主题变量
 - **Motion 14** — 入场动画，支持 `prefers-reduced-motion`
-- `next/font` — 自托管 Inter + Caveat 字体
+- `next/font/local` — 项目内自托管 Inter + Caveat WOFF2，构建和运行都不访问 Google Fonts
 
 ## 页面
 
@@ -39,6 +39,7 @@ npm run build      # 生产构建
 npm run start      # 启动生产服务
 npm run lint       # ESLint
 npm run typecheck  # TypeScript 类型检查
+npm run dev:clean  # 清空 .next 后重新启动开发服务
 ```
 
 如果全局 npm 缓存存在权限问题，可以指定临时缓存：
@@ -46,6 +47,43 @@ npm run typecheck  # TypeScript 类型检查
 ```bash
 npm install --cache /tmp/npm-cache
 ```
+
+## 启动排错
+
+### 1. 报错 `Failed to load SWC binary for darwin/arm64`
+
+说明 `node_modules` 里的 Next.js 编译器二进制不完整，通常是安装中断或移动 `node_modules` 导致的。重新安装即可：
+
+```bash
+rm -rf node_modules/@next/swc-darwin-arm64
+npm install
+```
+
+如果还有其他依赖缺失，可以做一次干净安装：
+
+```bash
+rm -rf node_modules .next
+npm ci
+```
+
+### 2. `localhost:3000` 一直转圈
+
+通常是旧 dev server 仍占用端口，或者 `.next` 缓存与当前进程状态不一致：
+
+```bash
+# 查看占用 3000 端口的进程
+lsof -nP -iTCP:3000 -sTCP:LISTEN
+
+# 结束旧进程（把 PID 换成上一步输出的进程号）
+kill <PID>
+
+# 清缓存后重新启动
+npm run dev:clean
+```
+
+### 3. 字体相关构建失败
+
+项目已把 Inter 和 Caveat 放入 `src/fonts/`，通过 `next/font/local` 加载，不再依赖 Google Fonts 网络请求。
 
 ## 目录结构
 
@@ -67,9 +105,13 @@ dailynote/
 │  │  ├─ robots.ts               robots.txt
 │  │  └─ icon.svg                favicon
 │  ├─ components/                UI 组件
-│  └─ data/
-│     ├─ site.ts                 个人信息、邮箱、社交链接
-│     └─ posts.ts                博客文章数据
+│  ├─ data/
+│  │  ├─ site.ts                 个人信息、邮箱、社交链接
+│  │  └─ posts.ts                博客文章数据
+│  └─ fonts/
+│     ├─ inter-latin.woff2       本地 Inter 可变字体
+│     ├─ caveat-latin.woff2      本地 Caveat 手写字体
+│     └─ OFL-*.txt               字体许可证
 ├─ .env.example                  环境变量示例
 └─ package.json
 ```
