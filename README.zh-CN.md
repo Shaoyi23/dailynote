@@ -13,6 +13,7 @@
 - **Tailwind CSS 4** — CSS-first 主题变量
 - **Motion 14** — 入场动画，支持 `prefers-reduced-motion`
 - `next/font/local` — 项目内自托管 Inter + Caveat WOFF2，构建和运行都不访问 Google Fonts
+- **MDX 内容管线** — `next-mdx-remote` + `gray-matter` + `zod`，文章以文件形式管理并在构建时校验
 
 ## 页面
 
@@ -93,6 +94,11 @@ npm run dev:clean
 
 ```text
 dailynote/
+├─ content/
+│  └─ blog/
+│     └─ <slug>/
+│        ├─ en.mdx               英文文章（frontmatter + MDX）
+│        └─ zh.mdx               可选中文版本
 ├─ public/
 │  └─ cartonAvator.png           头像，可替换成自己的照片
 ├─ src/
@@ -120,13 +126,19 @@ dailynote/
 │  │  ├─ lab-demos.tsx           6 个可交互 UX 组件
 │  │  ├─ lab-preview.tsx         列表卡片缩略预览
 │  │  ├─ lab-more-list.tsx       更多实验列表
+│  │  ├─ mdx.tsx                 MDX 代码块与 Callout
 │  │  ├─ track-explorer.tsx      赛道 SVG、弯道标记与介绍卡
 │  │  └─ ...                     其他 UI 组件
+│  ├─ lib/
+│  │  ├─ blog.ts                 文件系统博客加载 + Zod 校验
+│  │  └─ date.ts                 文章日期格式化
 │  ├─ data/
 │  │  ├─ site.ts                 个人信息、邮箱、社交链接
-│  │  ├─ posts.ts                博客文章数据
 │  │  ├─ lab.ts                  UX Lab mock 数据
-│  │  ├─ tracks.ts               F1 赛道与弯道数据
+│  │  ├─ tracks.ts               基础 F1 赛道数据
+│  │  ├─ tracks-extra.ts         新增六条赛道数据
+│  │  ├─ track-maps.json         赛道路径与弯道坐标
+│  │  ├─ track-types.ts          赛道类型定义
 │  │  └─ f1-circuits-LICENSE.txt 赛道几何数据 MIT 许可证
 │  └─ fonts/
 │     ├─ inter-latin.woff2       本地 Inter 可变字体
@@ -162,60 +174,62 @@ i also write blog
 
 ### 3. 新增或编辑博客文章
 
-所有文章都在 [`src/data/posts.ts`](src/data/posts.ts) 的 `posts` 数组中。
+博客已改为 **MDX 文件内容系统**，不再写在 TypeScript 数组里。每篇文章一个目录：
 
-新增一篇文章时，把对象放在数组顶部：
-
-```ts
-{
-  slug: "my-new-post",
-  title: "my new post",
-  description: "一句用于列表和 SEO 的描述。",
-  date: "2026-11-01",
-  readingTime: "3 min read",
-  content: [
-    { type: "paragraph", text: "正文段落。" },
-    { type: "heading", text: "小标题" },
-    { type: "quote", text: "引用。" },
-    { type: "list", items: ["列表项一", "列表项二"] },
-  ],
-}
+```text
+content/blog/
+  my-new-post/
+    en.mdx
+    zh.mdx        # 可选
 ```
 
-支持的内容块类型：
+`en.mdx` 示例：
 
-- `paragraph`：正文段落
-- `heading`：小标题
-- `quote`：引用
-- `list`：无序列表
-- `code`：带行号和轻量语法高亮的代码块
-- `callout`：用于答案、提示等强调内容
+```mdx
+---
+title: "my new post"
+description: "一句用于列表和 SEO 的描述。"
+date: "2026-11-01"
+readingTime: "3 min read"
+---
 
-保存后，博客列表、文章静态路由和 `sitemap.xml` 会自动更新，不需要额外配置。
+## 小标题
+
+正文段落。
+
+<Callout label="note">
+
+需要强调的内容。
+
+</Callout>
+```
+
+支持标准 Markdown 和 MDX：
+
+- 标题 `##`
+- 引用 `>`
+- 列表 `-`
+- 代码块
+- 自定义 `<Callout>` 组件
+
+frontmatter 会通过 [`src/lib/blog.ts`](src/lib/blog.ts) 里的 Zod schema 校验。保存后，博客列表、静态文章路由和 `sitemap.xml` 会在构建时自动更新。
 
 ### 4. 给文章增加中英切换
 
-在文章对象中加入可选的 `translation` 字段，详情页就会自动显示 `EN / 中文` 切换按钮。默认仍然显示英文：
+在同一个文章目录里额外放一个 `zh.mdx`，语言切换按钮会自动出现。中文文件同样使用 frontmatter：
 
-```ts
-{
-  slug: "my-new-post",
-  title: "my new post",
-  // ...英文内容
-  translation: {
-    lang: "zh-CN",
-    label: "中文",
-    title: "我的新文章",
-    description: "中文摘要。",
-    readingTime: "4 分钟阅读",
-    content: [
-      { type: "paragraph", text: "中文正文段落。" },
-    ],
-  },
-}
+```mdx
+---
+title: "我的新文章"
+description: "中文摘要。"
+date: "2026-11-01"
+readingTime: "4 分钟阅读"
+---
+
+中文正文。
 ```
 
-当前 `why var logs 3, 3, 3` 这篇文章已经带有完整的中文翻译，可以作为示例。没有 `translation` 字段的文章不会显示语言切换按钮。
+当前 `why var logs 3, 3, 3` 已经有完整的 `en.mdx` + `zh.mdx`，可以作为示例。没有 `zh.mdx` 的文章不会显示语言切换按钮，默认显示英文。
 
 ### 5. UX Lab 与交互组件
 
@@ -238,15 +252,26 @@ UX Lab 目前使用 mock 数据，分为三层：
 
 ### 6. F1 赛道指南
 
-赛道页面位于 `/track`，详情页位于 `/track/[slug]`。当前包含：
+赛道页面位于 `/track`，详情页位于 `/track/[slug]`。当前包含九条赛道：
 
 - monza
 - zandvoort
 - red bull ring
+- shanghai
+- spa
+- singapore
+- suzuka
+- baku
+- abu dhabi
 
-赛道、弯道、圈速和介绍数据都在 [`src/data/tracks.ts`](src/data/tracks.ts)。交互式 SVG 地图、hover 预览、点击选择、上/下一个弯、全部弯道快捷导航都在 [`src/components/track-explorer.tsx`](src/components/track-explorer.tsx)。
+赛道、弯道、圈速和介绍数据分为：
 
-赛道轮廓来自 [bacinger/f1-circuits](https://github.com/bacinger/f1-circuits)（MIT），许可证文件在 [`src/data/f1-circuits-LICENSE.txt`](src/data/f1-circuits-LICENSE.txt)。弯道标记和部分是用于展示的近似内容，不代表官方计时或赛道数据。
+- [`src/data/tracks.ts`](src/data/tracks.ts)：最初三条赛道
+- [`src/data/tracks-extra.ts`](src/data/tracks-extra.ts)：新增六条赛道及弯道说明
+- [`src/data/track-maps.json`](src/data/track-maps.json)：赛道线路和弯道坐标
+- [`src/components/track-explorer.tsx`](src/components/track-explorer.tsx)：交互式 SVG 地图、hover、点击、上/下一个弯与全部弯道导航
+
+赛道轮廓来自 [bacinger/f1-circuits](https://github.com/bacinger/f1-circuits)（MIT），许可证文件在 [`src/data/f1-circuits-LICENSE.txt`](src/data/f1-circuits-LICENSE.txt)。弯道标记和部分文案为展示用近似内容，不代表官方计时或赛道数据；后续可以替换为官方数据或接入 CMS。
 
 ### 7. 替换头像
 

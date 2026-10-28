@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { MDXRemote } from "next-mdx-remote/rsc";
 import { AmbientBackground } from "@/components/ambient-background";
 import { ArticleView } from "@/components/article-view";
+import { mdxComponents } from "@/components/mdx";
 import { PostList } from "@/components/post-list";
 import { RevealGroup, RevealItem } from "@/components/reveal";
-import { getMorePosts, getPostBySlug, posts } from "@/data/posts";
 import { siteConfig } from "@/data/site";
+import { getAllPosts, getMorePosts, getPostBySlug } from "@/lib/blog";
+import { formatDate } from "@/lib/date";
 
 type BlogPostPageProps = {
   params: Promise<{ slug: string }>;
 };
 
 export function generateStaticParams() {
-  return posts.map((post) => ({ slug: post.slug }));
+  return getAllPosts().map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({
@@ -26,23 +29,23 @@ export async function generateMetadata({
   }
 
   return {
-    title: post.title,
-    description: post.description,
+    title: post.en.title,
+    description: post.en.description,
     alternates: {
       canonical: `/blog/${post.slug}`,
     },
     openGraph: {
       type: "article",
       url: `/blog/${post.slug}`,
-      title: `${post.title} — ${siteConfig.name}`,
-      description: post.description,
-      publishedTime: post.date,
+      title: `${post.en.title} — ${siteConfig.name}`,
+      description: post.en.description,
+      publishedTime: post.en.date,
       authors: [siteConfig.name],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${post.title} — ${siteConfig.name}`,
-      description: post.description,
+      title: `${post.en.title} — ${siteConfig.name}`,
+      description: post.en.description,
     },
   };
 }
@@ -56,13 +59,21 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }
 
   const morePosts = getMorePosts(post.slug);
+  const dateLabel = formatDate(post.en.date);
+  const englishContent = (
+    <MDXRemote source={post.en.content} components={mdxComponents} />
+  );
+  const chineseContent = post.zh ? (
+    <MDXRemote source={post.zh.content} components={mdxComponents} />
+  ) : null;
+
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    headline: post.title,
-    description: post.description,
-    datePublished: post.date,
-    dateModified: post.date,
+    headline: post.en.title,
+    description: post.en.description,
+    datePublished: post.en.date,
+    dateModified: post.en.date,
     author: {
       "@type": "Person",
       name: siteConfig.name,
@@ -92,7 +103,27 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
         <RevealGroup className="flex flex-col gap-10 sm:gap-12">
           <RevealItem>
-            <ArticleView post={post} />
+            <ArticleView
+              date={post.en.date}
+              dateLabel={dateLabel}
+              english={{
+                lang: "en",
+                title: post.en.title,
+                readingTime: post.en.readingTime,
+                content: englishContent,
+              }}
+              chinese={
+                post.zh
+                  ? {
+                      lang: "zh-CN",
+                      label: "中文",
+                      title: post.zh.title,
+                      readingTime: post.zh.readingTime,
+                      content: chineseContent,
+                    }
+                  : undefined
+              }
+            />
           </RevealItem>
 
           <RevealItem>

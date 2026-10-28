@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { formatPostDate, type Post } from "@/data/posts";
+import type { PostSummary } from "@/lib/blog";
+import { formatDate } from "@/lib/date";
 
 export function PostList({
   posts,
   highlightNew = false,
 }: {
-  posts: Post[];
+  posts: PostSummary[];
   highlightNew?: boolean;
 }) {
   return (
@@ -50,7 +51,7 @@ export function PostList({
               dateTime={post.date}
               className="shrink-0 text-meta text-muted"
             >
-              {formatPostDate(post.date)}
+              {formatDate(post.date)}
             </time>
           </Link>
         </li>

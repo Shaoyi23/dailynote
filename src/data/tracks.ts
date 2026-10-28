@@ -1,42 +1,10 @@
-export type TrackTurn = {
-  number: number;
-  name: string;
-  direction: string;
-  speed: string;
-  type: string;
-  description: string;
-  challenge: string;
-  overtaking?: boolean;
-  story?: string;
-  x: number;
-  y: number;
-};
+import { extraTracks } from "./tracks-extra";
+import type { Track } from "./track-types";
 
-export type Track = {
-  slug: string;
-  name: string;
-  shortName: string;
-  country: string;
-  city: string;
-  tagline: string;
-  summary: string;
-  lengthKm: number;
-  turnCount: number;
-  direction: string;
-  lapRecord: {
-    time: string;
-    driver: string;
-    year: number;
-  };
-  drsZones: number;
-  laps: number;
-  firstGrandPrix: number;
-  mapNote: string;
-  path: string;
-  turns: TrackTurn[];
-};
+export type { Track, TrackTurn } from "./track-types";
 
-export const tracks: Track[] = [
+const baseTracks: Track[] = [
+
   {
     slug: "monza",
     name: "Autodromo Nazionale Monza",
@@ -576,6 +544,8 @@ export const tracks: Track[] = [
     ],
   },
 ];
+
+export const tracks: Track[] = [...baseTracks, ...extraTracks];
 
 export function getTrack(slug: string) {
   return tracks.find((track) => track.slug === slug);

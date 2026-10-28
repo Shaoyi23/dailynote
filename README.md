@@ -19,6 +19,8 @@ social links, and blog posts are placeholders. Replace them before deploying.
   motion support
 - `next/font/local` — bundled Inter + Caveat WOFF2 files, no Google Fonts
   request at build or runtime
+- **MDX content pipeline** — `next-mdx-remote` + `gray-matter` + `zod`; posts
+  live as files and are validated at build time
 
 ## Pages
 
@@ -63,21 +65,45 @@ Copy `.env.example` to `.env.local` and set your production URL when you deploy.
 2. **Homepage copy** — edit [`src/app/page.tsx`](src/app/page.tsx). The
    "i also write blog" line links to the blog index, the UX lab phrase links to
    `/ux-lab`, and the Formula 1 line links to `/track`.
-3. **Blog posts** — add or edit entries in [`src/data/posts.ts`](src/data/posts.ts).
-   The list page, article routes, and sitemap are generated from this array.
-   Add an optional `translation` object (`lang: "zh-CN"`, title, description,
-   reading time, content) to show an `EN / 中文` switch on that article. The
-   default reading language stays English.
+3. **Blog posts** — content lives in
+   [`content/blog/`](content/blog), one folder per slug. Each post has
+   `en.mdx`; add `zh.mdx` for a Chinese version and the `EN / 中文` switch
+   appears automatically. Frontmatter is validated with Zod at build time:
+
+   ```mdx
+   ---
+   title: "my new post"
+   description: "One sentence for the list and SEO."
+   date: "2026-11-01"
+   readingTime: "3 min read"
+   ---
+
+   ## a heading
+
+   A paragraph of body copy.
+
+   <Callout label="note">
+
+   Something worth highlighting.
+
+   </Callout>
+   ```
+
+   The list page, static article routes, and sitemap are generated from the
+   filesystem. No database or rebuild service is required yet.
 4. **UX lab** — mock experiment copy lives in [`src/data/lab.ts`](src/data/lab.ts).
    Interactive demos and card previews are in
    [`src/components/lab-demos.tsx`](src/components/lab-demos.tsx) and
    [`src/components/lab-preview.tsx`](src/components/lab-preview.tsx). Adding a
    data entry with an existing `demo` kind is enough to create a new page.
-5. **F1 track guide** — circuit content lives in
-   [`src/data/tracks.ts`](src/data/tracks.ts); the interactive map and corner
-   list are in [`src/components/track-explorer.tsx`](src/components/track-explorer.tsx).
-   Add a third or fourth circuit by following the `Track` type and reusing the
-   existing map UI.
+5. **F1 track guide** — the site ships with nine circuits. Base circuits live
+   in [`src/data/tracks.ts`](src/data/tracks.ts), newer additions in
+   [`src/data/tracks-extra.ts`](src/data/tracks-extra.ts), and map geometry in
+   [`src/data/track-maps.json`](src/data/track-maps.json). The interactive map
+   and corner list are in
+   [`src/components/track-explorer.tsx`](src/components/track-explorer.tsx).
+   To add a circuit, add a map entry and a `makeTrack(...)` definition following
+   the `Track` type.
 6. **Avatar** — [`public/cartonAvator.png`](public/cartonAvator.png) is used by
    [`src/components/avatar.tsx`](src/components/avatar.tsx). Replace that file,
    or update the `src` if you rename it. Next.js optimizes the 1254px source into
@@ -93,6 +119,11 @@ Copy `.env.example` to `.env.local` and set your production URL when you deploy.
 ## Structure
 
 ```text
+content/
+  blog/
+    <slug>/
+      en.mdx                 article source + validated frontmatter
+      zh.mdx                 optional Chinese article
 src/
   app/
     globals.css              design tokens, ambient background, shared styles
@@ -108,13 +139,14 @@ src/
     opengraph-image.tsx      dynamic social image
   components/
     ambient-background.tsx
-    article-view.tsx         article body, code blocks, EN/中文 switch
+    article-view.tsx         article header + EN/中文 switch
     avatar.tsx
     back-link.tsx
     icons.tsx                hand-drawn SVG brand/tech marks
     lab-demos.tsx            six interactive UX experiments
     lab-more-list.tsx        more-experiments list
     lab-preview.tsx          static card previews
+    mdx.tsx                  MDX code blocks + Callout
     pill-link.tsx
     post-list.tsx
     reveal.tsx               Motion entrance group
@@ -123,10 +155,15 @@ src/
     track-explorer.tsx       SVG circuit map + corner explorer
   data/
     site.ts                  the one file to edit first
-    posts.ts                 blog content
     lab.ts                   mock UX lab content
-    tracks.ts                F1 circuit data
+    tracks.ts                base F1 circuit data
+    tracks-extra.ts          the six newer circuits
+    track-maps.json          circuit paths + marker coordinates
+    track-types.ts           shared track types
     f1-circuits-LICENSE.txt  MIT license for circuit geometry
+  lib/
+    blog.ts                  filesystem content loader + Zod validation
+    date.ts                  shared post date formatter
   fonts/
     inter-latin.woff2        bundled variable font
     caveat-latin.woff2       bundled handwritten font
@@ -165,3 +202,6 @@ host's environment settings.
   [bacinger/f1-circuits](https://github.com/bacinger/f1-circuits) under the MIT
   license. The turn positions and notes are illustrative rather than official
   timing data.
+- Blog content is intentionally file-based. It can later be moved behind a
+  CMS, but the current setup keeps builds deterministic and content reviewable
+  in Git.

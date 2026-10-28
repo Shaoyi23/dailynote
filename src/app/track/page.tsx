@@ -8,7 +8,7 @@ import { siteConfig } from "@/data/site";
 import { tracks, type Track } from "@/data/tracks";
 
 const description =
-  "Three Formula 1 circuits, explored corner by corner through their lines, stories, and the moments that decide a lap.";
+  "Nine Formula 1 circuits, explored corner by corner through their lines, stories, and the moments that decide a lap.";
 
 export const metadata: Metadata = {
   title: "Tracks",
@@ -148,7 +148,7 @@ export default function TrackPage() {
               <div className="flex flex-col gap-2">
                 <h1 className="text-lead text-ink">tracks</h1>
                 <p className="max-w-[34rem] text-body text-pretty text-secondary">
-                  three circuits i keep coming back to. pick one and explore it
+                  nine circuits i keep coming back to. pick one and explore it
                   corner by corner.
                 </p>
               </div>

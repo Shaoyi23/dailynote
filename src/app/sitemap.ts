@@ -1,10 +1,12 @@
 import type { MetadataRoute } from "next";
 import { labExperiments } from "@/data/lab";
-import { posts } from "@/data/posts";
 import { siteConfig } from "@/data/site";
 import { tracks } from "@/data/tracks";
+import { getAllPosts } from "@/lib/blog";
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const posts = getAllPosts();
+
   const postEntries: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${siteConfig.url}/blog/${post.slug}`,
     lastModified: new Date(`${post.date}T12:00:00Z`),

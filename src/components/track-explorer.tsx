@@ -313,8 +313,8 @@ export function TrackExplorer({ track }: { track: Track }) {
       </div>
 
       <div className="mx-auto flex w-full max-w-[48rem] flex-col gap-5">
-        <div className="flex items-start gap-3">
-          <p className="shrink-0 pt-2 text-[0.58rem] uppercase tracking-[0.13em] text-muted">
+        <div className="flex flex-col gap-2">
+          <p className="text-[0.58rem] uppercase tracking-[0.13em] text-muted">
             all corners
           </p>
           <nav

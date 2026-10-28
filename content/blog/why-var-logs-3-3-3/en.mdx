@@ -1,0 +1,75 @@
+---
+title: "why var logs 3, 3, 3"
+description: "A classic JavaScript quiz, unpacked: scope, closures, and the event loop behind three little 3s."
+date: "2026-10-28"
+readingTime: "6 min read"
+---
+
+There is a famous JavaScript quiz that looks like a trap: a for loop with var, three timers, and one question. What gets logged? The choices usually look something like [0, 1, 2], 0, 1, 2, 3, 3, 3, or an infinite loop.
+
+```js
+for (var i = 0; i < 3; i++) {
+  setTimeout(() => {
+    console.log(i);
+  }, 1000);
+}
+```
+
+If your first instinct is 0, 1, 2, you are thinking about the value of i when each callback is created. That is a reasonable guess, but JavaScript is not saving a snapshot of that value for the timer.
+
+## the answer
+
+<Callout label="correct answer">
+
+C — 3, 3, 3
+
+</Callout>
+
+The loop finishes synchronously before any timer fires. By the time the callbacks run, the single var i has already reached 3. Each callback prints 3 on its own line, so the final output is three 3s.
+
+## one binding, three closures
+
+var is function-scoped, or global at the top level. That means all three callbacks close over the same i. The closure does not capture the number 0, 1, or 2. It captures the variable itself. When the callback finally reads i, the loop is over and the value is 3.
+
+> The timer does not capture the value. It captures the variable.
+
+## the event loop does the rest
+
+setTimeout schedules each callback and returns immediately. The loop runs to completion, i becomes 3, and the condition fails. Only then does the event loop process the timers. All three callbacks see i === 3.
+
+The 1000ms delay also does not create one second between each log. The callbacks are queued around the same time and then run one after another, so you see three 3s at almost the same moment.
+
+## the let version
+
+Change var to let and the output becomes 0, 1, 2. In a for loop, let creates a new binding for each iteration. Each callback closes over its own iteration's binding, so the value is preserved.
+
+```js
+for (let i = 0; i < 3; i++) {
+  setTimeout(() => {
+    console.log(i);
+  }, 1000);
+}
+```
+
+## other ways to capture the value
+
+If you have to keep var, you can pass the current value into the callback explicitly. setTimeout accepts extra arguments and forwards them to the function.
+
+```js
+for (var i = 0; i < 3; i++) {
+  setTimeout((value) => {
+    console.log(value);
+  }, 1000, i);
+}
+```
+
+An immediately invoked function expression can also create a new scope for each iteration, but let is usually clearer and easier to read.
+
+## what to remember
+
+- var is function-scoped; let and const are block-scoped.
+- Closures capture bindings, not snapshots of values.
+- Timers run after the current synchronous code has finished.
+- A for loop with let creates a fresh binding on every iteration.
+
+The quiz is not really about setTimeout. It is about the gap between when code is written and when it actually runs. Once that gap is clear, a lot of asynchronous JavaScript starts to make sense.

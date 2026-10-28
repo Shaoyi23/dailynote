@@ -3,11 +3,13 @@ import { AmbientBackground } from "@/components/ambient-background";
 import { BackLink } from "@/components/back-link";
 import { PostList } from "@/components/post-list";
 import { RevealGroup, RevealItem } from "@/components/reveal";
-import { posts } from "@/data/posts";
 import { siteConfig } from "@/data/site";
+import { getAllPosts } from "@/lib/blog";
 
 const description =
   "Notes on interface details, frontend craft, and the things I learn while building.";
+
+const posts = getAllPosts();
 
 export const metadata: Metadata = {
   title: "Blog",

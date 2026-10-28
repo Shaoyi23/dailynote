@@ -305,6 +305,105 @@
     opacity: 1;
     transform: translate(-50%, 0);
   }
+
+  .article-mdx {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .article-mdx h2 {
+    margin-top: 0.2rem;
+    color: var(--ink);
+    font-size: 1.02rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .article-mdx p {
+    color: var(--secondary);
+    font-size: var(--text-body);
+    line-height: 1.8;
+    text-wrap: pretty;
+  }
+
+  .article-mdx ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-left: 1.25rem;
+    color: var(--secondary);
+    font-size: var(--text-body);
+    line-height: 1.75;
+    list-style: disc;
+  }
+
+  .article-mdx ol {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-left: 1.4rem;
+    color: var(--secondary);
+    font-size: var(--text-body);
+    line-height: 1.75;
+    list-style: decimal;
+  }
+
+  .article-mdx li {
+    padding-left: 0.2rem;
+  }
+
+  .article-mdx li::marker {
+    color: color-mix(in srgb, var(--clay) 70%, transparent);
+  }
+
+  .article-mdx blockquote {
+    border-left: 1px solid color-mix(in srgb, var(--clay) 50%, transparent);
+    padding-left: 1rem;
+    color: color-mix(in srgb, var(--ink) 75%, transparent);
+    font-size: 1.04rem;
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .article-mdx a {
+    color: var(--sage);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: color-mix(in srgb, var(--sage) 42%, transparent);
+    transition:
+      color 180ms ease,
+      text-decoration-color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .article-mdx a:hover {
+    text-decoration-color: currentColor;
+    background-color: color-mix(in srgb, var(--sage) 8%, transparent);
+    border-radius: 0.12em;
+  }
+
+  .article-mdx strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .article-mdx :not(pre) > code {
+    border-radius: 0.22rem;
+    background: var(--fill);
+    padding: 0.13em 0.36em;
+    color: var(--ink);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      "Liberation Mono", "Courier New", monospace;
+    font-size: 0.85em;
+  }
+
+  .article-mdx img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+  }
 }
 
 @keyframes marker-draw {
