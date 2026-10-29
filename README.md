@@ -1,9 +1,8 @@
 # dailynote · personal site
 
-A quiet, text-first personal website built with the current frontend stack. The
-layout takes cues from [sanyam.sh](https://sanyam.sh/) — a narrow reading column,
+A quiet, text-first personal website built with the current frontend stack. — a narrow reading column,
 lowercase typography, inline links, a handwritten signature, and lots of
-breathing room — with a softer, warmer background treatment.
+breathing room — with a softer, warmer background .
 
 The project lives in `dailynote/`. The default name, location, email, domain,
 social links, and blog posts are placeholders. Replace them before deploying.
