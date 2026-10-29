@@ -23,7 +23,7 @@ export function Avatar() {
         />
         <span
           aria-hidden="true"
-          className="status-dot absolute -bottom-0.5 -right-0.5 size-[0.7rem] rounded-full border-2 border-canvas bg-[#71876f]"
+          className="status-dot absolute -bottom-0.5 -right-0.5 size-[0.7rem] rounded-full border-2 border-canvas bg-sage"
         />
       </div>
       <span className="sr-only">{siteConfig.availability}</span>

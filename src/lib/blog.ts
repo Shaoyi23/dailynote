@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import { z } from "zod";
+import { blogCategoryIds } from "@/lib/categories";
 
 const blogDirectory = path.join(process.cwd(), "content/blog");
 
@@ -12,6 +13,9 @@ const frontmatterSchema = z.object({
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "date must use YYYY-MM-DD"),
   readingTime: z.string().trim().min(1, "readingTime is required"),
+  category: z.enum(blogCategoryIds, {
+    error: `must be one of: ${blogCategoryIds.join(", ")}`,
+  }),
 });
 
 export type PostMeta = z.infer<typeof frontmatterSchema>;
@@ -103,6 +107,7 @@ export function getAllPosts(): PostSummary[] {
         readingTime: post.en.readingTime,
         slug: post.slug,
         hasTranslation: Boolean(post.zh),
+        category: post.en.category,
       };
     })
     .filter((post): post is PostSummary => post !== null)

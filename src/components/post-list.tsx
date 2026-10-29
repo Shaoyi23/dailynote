@@ -1,61 +1,96 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
+import { blogCategoryMeta } from "@/lib/categories";
 import type { PostSummary } from "@/lib/blog";
 import { formatDate } from "@/lib/date";
+import { matchTitle, type MatchRange } from "@/lib/search";
+
+function titleContent(title: string, ranges: MatchRange[]) {
+  if (ranges.length === 0) {
+    return title;
+  }
+
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+
+  ranges.forEach(([start, end], index) => {
+    if (start > cursor) {
+      parts.push(title.slice(cursor, start));
+    }
+
+    parts.push(
+      <mark key={`match-${index}`} className="title-match">
+        {title.slice(start, end)}
+      </mark>,
+    );
+    cursor = end;
+  });
+
+  if (cursor < title.length) {
+    parts.push(title.slice(cursor));
+  }
+
+  return parts;
+}
 
 export function PostList({
   posts,
   highlightNew = false,
+  query = "",
 }: {
   posts: PostSummary[];
   highlightNew?: boolean;
+  query?: string;
 }) {
+  const trimmedQuery = query.trim();
+
   return (
     <ul className="-mx-4 flex flex-col gap-1">
-      {posts.map((post, index) => (
-        <li key={post.slug}>
-          <Link
-            href={`/blog/${post.slug}`}
-            title={post.title}
-            className="group relative flex items-center gap-3 rounded-full px-4 py-2 transition-colors duration-200 hover:bg-fill active:bg-fill-hover focus-visible:ring-2 focus-visible:ring-ink/15"
-          >
-            {highlightNew && index === 0 ? (
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute left-0 top-1/2 hidden -translate-x-[calc(100%+0.55rem)] -translate-y-1/2 -rotate-6 md:block"
-              >
-                <span className="relative inline-flex items-center justify-center px-2.5 py-1 font-hand text-[1.15rem] leading-none text-clay/85">
-                  new
-                  <svg
-                    viewBox="0 0 62 40"
-                    preserveAspectRatio="none"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                    className="pointer-events-none absolute -inset-x-1 -inset-y-1 h-[calc(100%+0.5rem)] w-[calc(100%+0.5rem)]"
-                  >
-                    <path d="M29 36.5C34 37.5 41 37 46 35.5C52.5 34 58 30.5 58.2 25C59.8 17 55.5 8 47 5.5C39 3.5 30 2.8 22 4C13 5.5 4.5 9.5 3.5 17C2.8 26 10 33.5 24 36C30 37 37 36.5 44 34.2" />
-                  </svg>
-                </span>
-              </span>
-            ) : null}
+      {posts.map((post, index) => {
+        const category = blogCategoryMeta[post.category];
+        const match = trimmedQuery
+          ? matchTitle(post.title, trimmedQuery)
+          : null;
 
-            <span className="min-w-0 shrink truncate text-body leading-tight text-ink">
-              {post.title}
-            </span>
-            <span
-              aria-hidden="true"
-              className="h-px min-w-4 flex-1 bg-line/70 transition-colors duration-200 group-hover:bg-line"
-            />
-            <time
-              dateTime={post.date}
-              className="shrink-0 text-meta text-muted"
+        return (
+          <li key={post.slug}>
+            <Link
+              href={`/blog/${post.slug}`}
+              title={post.title}
+              className="group grid grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-x-2 rounded-2xl px-3 py-2 transition-colors duration-200 hover:bg-fill active:bg-fill-hover focus-visible:ring-2 focus-visible:ring-ink/15 sm:grid-cols-[4.25rem_minmax(0,1fr)_auto] sm:gap-x-3 sm:px-4"
             >
-              {formatDate(post.date)}
-            </time>
-          </Link>
-        </li>
-      ))}
+              <span
+                className="truncate text-[0.7rem] leading-none tracking-[0.03em]"
+                style={{ color: `var(--${category.tone})` }}
+              >
+                {category.label}
+              </span>
+
+              <span className="flex min-w-0 items-center gap-2 sm:gap-3">
+                <span className="min-w-0 shrink truncate text-body leading-tight text-ink">
+                  {titleContent(post.title, match?.ranges ?? [])}
+                </span>
+                {highlightNew && index === 0 ? (
+                  <span
+                    aria-hidden="true"
+                    className="hidden shrink-0 -rotate-6 font-hand text-[1rem] leading-none text-clay/85 sm:inline-block"
+                  >
+                    new
+                  </span>
+                ) : null}
+                <span
+                  aria-hidden="true"
+                  className="hidden h-px min-w-4 flex-1 bg-line/70 transition-colors duration-200 group-hover:bg-line sm:block"
+                />
+              </span>
+
+              <time dateTime={post.date} className="text-meta text-muted">
+                {formatDate(post.date)}
+              </time>
+            </Link>
+          </li>
+        );
+      })}
     </ul>
   );
 }

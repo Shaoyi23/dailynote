@@ -40,8 +40,10 @@ without permission.
 
 - Blog posts are MDX, one folder per slug:
   `content/blog/<slug>/en.mdx` and optional `zh.mdx`.
-- Frontmatter requires `title`, `description`, `date` (YYYY-MM-DD), and
-  `readingTime`; it is validated with Zod by `src/lib/blog.ts`.
+- Frontmatter requires `title`, `description`, `date` (YYYY-MM-DD),
+  `readingTime`, and `category` (`ai`, `typescript`, `node`, or `design`); it is
+  validated with Zod by `src/lib/blog.ts`. Category metadata lives in
+  `src/lib/categories.ts` and is safe to import from client components.
 - Do not reintroduce `src/data/posts.ts`.
 - Available MDX custom components: `<Callout>`, `<ThisBindingDiagram>`,
   `<CallApplyBindDiagram>`, `<EventLoopDiagram>`.

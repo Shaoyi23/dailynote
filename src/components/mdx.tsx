@@ -68,7 +68,7 @@ function CodePre({ children }: { children?: ReactNode }) {
   const lines = raw.split("\n");
 
   return (
-    <div className="overflow-hidden rounded-lg border border-line/80 bg-[#f0e8dc]/70">
+    <div className="overflow-hidden rounded-lg border border-line/80 bg-fill/70">
       <div className="border-b border-line/70 px-4 py-2">
         <span className="font-mono text-[0.64rem] tracking-[0.12em] text-muted">
           {language}

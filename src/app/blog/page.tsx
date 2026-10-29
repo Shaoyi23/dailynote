@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { AmbientBackground } from "@/components/ambient-background";
 import { BackLink } from "@/components/back-link";
-import { PostList } from "@/components/post-list";
+import { BlogExplorer } from "@/components/blog-explorer";
 import { RevealGroup, RevealItem } from "@/components/reveal";
 import { siteConfig } from "@/data/site";
 import { getAllPosts } from "@/lib/blog";
 
 const description =
-  "Notes on interface details, frontend craft, and the things I learn while building.";
+  "Notes on AI, TypeScript, Node, and the interface details that hold a product together.";
 
 const posts = getAllPosts();
 
@@ -75,15 +75,15 @@ export default function BlogPage() {
               <div className="flex flex-col gap-2">
                 <h1 className="text-lead text-ink">blog</h1>
                 <p className="text-body text-pretty text-secondary">
-                  notes on what i’m learning, mostly interface details and the
-                  web.
+                  notes on ai, typescript, node, and the interface details
+                  around them.
                 </p>
               </div>
             </div>
           </RevealItem>
 
           <RevealItem>
-            <PostList posts={posts} highlightNew />
+            <BlogExplorer posts={posts} />
           </RevealItem>
         </RevealGroup>
       </div>

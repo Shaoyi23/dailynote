@@ -95,7 +95,7 @@ function FocusPreview() {
   return (
     <div className="w-full max-w-[13rem]">
       <div className="relative rounded-md border border-sage/35 bg-canvas/70 px-3 pb-2.5 pt-4 ring-4 ring-sage/10 transition-shadow duration-300 group-hover:ring-sage/15">
-        <span className="absolute -top-2 left-2.5 bg-[#f7f2e8] px-1 text-[0.54rem] text-sage">
+        <span className="absolute -top-2 left-2.5 bg-canvas px-1 text-[0.54rem] text-sage">
           what are you building?
         </span>
         <span className="text-[0.68rem] text-ink/80">a quieter inbox</span>

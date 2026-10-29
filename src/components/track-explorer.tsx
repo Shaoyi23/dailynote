@@ -39,7 +39,7 @@ function CornerCard({
   return (
     <section
       aria-label={`Turn ${turn.number}: ${turn.name}`}
-      className="rounded-xl border border-line/90 bg-[#fbf8f1]/65 p-5 sm:p-6"
+      className="rounded-xl border border-line/90 bg-canvas/65 p-5 sm:p-6"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
@@ -133,7 +133,7 @@ function TrackOverview({
   onStart: () => void;
 }) {
   return (
-    <section className="rounded-xl border border-line/90 bg-[#fbf8f1]/65 p-5 sm:p-6">
+    <section className="rounded-xl border border-line/90 bg-canvas/65 p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="font-mono text-[0.62rem] tracking-[0.14em] text-racing">
@@ -268,7 +268,7 @@ export function TrackExplorer({ track }: { track: Track }) {
                     }}
                     className={`absolute grid size-7 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border font-mono text-[0.62rem] transition-[transform,background-color,color,border-color,box-shadow] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hivis focus-visible:ring-offset-2 focus-visible:ring-offset-carbon ${
                       selectedIndex === index
-                        ? "scale-110 border-racing bg-racing text-white shadow-[0_0_0_4px_rgba(210,59,46,0.18)]"
+                        ? "scale-110 border-racing bg-racing text-white shadow-[0_0_0_4px_rgba(201,58,44,0.20)]"
                         : active
                           ? "scale-110 border-hivis bg-track text-carbon"
                           : "border-hivis/20 bg-hivis text-carbon hover:border-track hover:bg-track"

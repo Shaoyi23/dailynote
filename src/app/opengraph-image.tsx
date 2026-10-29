@@ -19,7 +19,7 @@ export default function OpenGraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           overflow: "hidden",
-          background: "#f6f1e7",
+          background: "#f7f3ea",
           color: "#2c2923",
           padding: "70px 82px",
           position: "relative",
@@ -33,7 +33,7 @@ export default function OpenGraphImage() {
             width: 640,
             height: 640,
             borderRadius: 9999,
-            background: "rgba(233, 198, 174, 0.55)",
+            background: "rgba(236, 197, 166, 0.5)",
             display: "flex",
           }}
         />
@@ -45,7 +45,7 @@ export default function OpenGraphImage() {
             width: 700,
             height: 700,
             borderRadius: 9999,
-            background: "rgba(190, 204, 180, 0.55)",
+            background: "rgba(176, 200, 170, 0.5)",
             display: "flex",
           }}
         />
@@ -64,7 +64,7 @@ export default function OpenGraphImage() {
               width: 62,
               height: 62,
               borderRadius: 9999,
-              background: "linear-gradient(145deg, #e9d4ba 0%, #b2bca1 100%)",
+              background: "linear-gradient(145deg, #ecd2b2 0%, #a6c1a0 100%)",
             }}
           />
           <div
