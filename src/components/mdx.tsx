@@ -3,6 +3,11 @@ import {
   isValidElement,
   type ReactNode,
 } from "react";
+import {
+  CallApplyBindDiagram,
+  EventLoopDiagram,
+  ThisBindingDiagram,
+} from "@/components/blog-diagrams";
 
 function nodeText(node: ReactNode): string {
   if (typeof node === "string" || typeof node === "number") {
@@ -116,4 +121,7 @@ function Callout({
 export const mdxComponents = {
   pre: CodePre,
   Callout,
+  ThisBindingDiagram,
+  CallApplyBindDiagram,
+  EventLoopDiagram,
 };

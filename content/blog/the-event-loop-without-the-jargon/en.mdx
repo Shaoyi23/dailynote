@@ -1,0 +1,156 @@
+---
+title: "the event loop, without the jargon"
+description: "Why JavaScript can run one thing at a time and still handle timers, clicks, and network replies without freezing."
+date: "2026-10-27"
+readingTime: "9 min read"
+---
+
+JavaScript runs one piece of code at a time. That sounds like a limitation until you notice that a browser can wait for a timer, receive a click, fetch a file, and update the page at the same time.
+
+The event loop is the part that makes that possible. It is not a second thread. It is a scheduling rule: do this now, put that aside, and come back when the current work is finished.
+
+<EventLoopDiagram />
+
+## the kitchen analogy
+
+Imagine a small kitchen with one cook.
+
+- The **call stack** is what the cook is holding right now. One task at a time.
+- The **web APIs** are the oven, the delivery driver, and the timer. They can work while the cook keeps chopping.
+- The **task queue** is the row of finished orders waiting to be plated.
+- The **microtask queue** is the quick check that has to happen before the next order: taste the sauce, wipe the counter, verify the ticket.
+- The **event loop** is the pass that decides what happens next.
+
+The analogy is not perfect, but the important part is: the cook never stops halfway through a dish to start another one. Work is finished, then the next piece is chosen.
+
+## synchronous code goes first
+
+Run this in a browser console:
+
+```js
+console.log("A");
+
+setTimeout(() => {
+  console.log("B");
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log("C");
+});
+
+console.log("D");
+```
+
+The order is:
+
+```text
+A
+D
+C
+B
+```
+
+Why?
+
+1. `A` runs immediately on the call stack.
+2. `setTimeout` hands the callback to the browser's timer system. The timer is not part of the current call.
+3. `Promise.resolve().then(...)` schedules a microtask.
+4. `D` runs because the synchronous code is not finished yet.
+5. The call stack is now empty. The event loop drains the microtask queue: `C`.
+6. The timer callback is ready, so the next task runs: `B`.
+
+The `0` in `setTimeout(..., 0)` does not mean "run this now". It means "put this in the task queue as soon as possible, after the current work".
+
+## microtasks before the next task
+
+Promises, `queueMicrotask`, and `MutationObserver` use the microtask queue. Timers, clicks, and network callbacks are tasks.
+
+The rule that matters:
+
+> After each task, the event loop drains the entire microtask queue before taking the next task.
+
+That is why `C` comes before `B`. The promise callback was a microtask, and the timer callback was a task.
+
+A microtask can schedule another microtask. If it keeps doing that forever, the next task never gets a turn:
+
+```js
+function keepGoing() {
+  Promise.resolve().then(keepGoing);
+}
+
+keepGoing();
+```
+
+This is a microtask starvation loop. The stack may look empty, but the browser never gets to paint or handle the next click. Ordinary recursion blows the stack; this kind of loop can quietly freeze the page instead.
+
+## async and await use the same queue
+
+`async` and `await` do not create a separate scheduler. They are built on promises.
+
+```js
+async function run() {
+  console.log(1);
+  await Promise.resolve();
+  console.log(2);
+}
+
+run();
+console.log(3);
+```
+
+The output is:
+
+```text
+1
+3
+2
+```
+
+`await` splits the function. Everything before the `await` runs synchronously. The rest is resumed later as a microtask. `console.log(3)` gets to run first because the synchronous part of `run` has reached the suspension point.
+
+This is why `await` is not a pause button for the whole page. It pauses that async function, not the JavaScript runtime.
+
+## what about rendering?
+
+The browser needs a chance to paint. It can render between tasks, when the call stack and microtasks are clear.
+
+If a task runs for too long, the page cannot respond. A five-second synchronous loop blocks clicks, timers, and painting for five seconds. Breaking that work into smaller tasks gives the browser a chance to breathe.
+
+For animation, use `requestAnimationFrame` rather than a tight timer loop. For non-urgent work, consider breaking the job into chunks. The event loop is a queue, not a magic performance fix.
+
+## timers are not exact
+
+A timer with a 100ms delay does not guarantee that the callback starts exactly 100ms later. It guarantees that the callback will not be queued before that delay has passed, and it still has to wait for the current task and all microtasks.
+
+Timers can be delayed by other work, browser throttling, or a background tab. Use them for "later", not for precise scheduling.
+
+## browser vs Node.js
+
+The same mental model applies in Node.js, but the queues have different names. Node has timers, I/O callbacks, `setImmediate`, and `process.nextTick`, and the exact ordering is more detailed than the browser's.
+
+Do not memorize the platform-specific queues first. Learn the shape:
+
+```text
+current synchronous work
+→ microtasks
+→ next task
+→ render / repeat
+```
+
+Once that shape is clear, platform details are much easier to place.
+
+## a practical checklist
+
+- Finish synchronous work first; do not expect `setTimeout(..., 0)` to jump the queue.
+- Use promises and `await` when you need ordering, not timers.
+- Do not recursively schedule microtasks without a break.
+- Break long CPU work into smaller tasks so the browser can paint.
+- Treat timers as "at least this late", not "exactly at this time".
+
+<Callout label="the one-line version">
+
+JavaScript finishes the current task, drains every microtask, then takes one task, renders if it can, and repeats.
+
+</Callout>
+
+If you want the companion pieces, read [how this is decided by the call site](/blog/this-is-decided-by-the-call-site) and [call, apply, and bind](/blog/call-apply-bind-the-same-job-in-three-shapes).

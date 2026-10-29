@@ -1,0 +1,175 @@
+---
+title: "call, apply, bind: the same job in three shapes"
+description: "Three function methods that all answer the same question: can I choose this and the arguments? The difference is mostly packaging."
+date: "2026-10-28"
+readingTime: "6 min read"
+---
+
+`call`, `apply`, and `bind` are not three unrelated language features. They solve one problem: a function can be borrowed and given a different `this`, plus some arguments.
+
+The difference is how the arguments are packaged and when the function actually runs.
+
+<CallApplyBindDiagram />
+
+## one function, three ways to use it
+
+Here is a function that depends on `this`:
+
+```js
+function introduce(greeting, punctuation) {
+  return `${greeting}, ${this.name}${punctuation}`;
+}
+
+const ada = { name: "Ada" };
+```
+
+Call it with a chosen receiver:
+
+```js
+introduce.call(ada, "hello", "!");
+// "hello, Ada!"
+```
+
+With `call`, the first argument is `this`, and the rest are the function's arguments.
+
+`apply` does the same thing, but the arguments arrive as an array:
+
+```js
+introduce.apply(ada, ["hello", "!"]);
+// "hello, Ada!"
+```
+
+`bind` is the different one. It does not call the function. It returns a new function with `this` locked in:
+
+```js
+const helloAda = introduce.bind(ada, "hello");
+
+helloAda("!");
+// "hello, Ada!"
+```
+
+That is the whole family:
+
+- `call` runs now, arguments listed one by one.
+- `apply` runs now, arguments in an array.
+- `bind` returns a function for later.
+
+## borrowing a method
+
+Older JavaScript code used `apply` to borrow methods from built-in prototypes. A common example is copying an array-like object:
+
+```js
+function copyArgs() {
+  return Array.prototype.slice.call(arguments);
+}
+```
+
+`arguments` has a `length` and numeric keys, but it is not a real array. By calling `slice` with `arguments` as `this`, we borrow the method for one call.
+
+Modern code usually says this instead:
+
+```js
+function copyArgs(...args) {
+  return args;
+}
+```
+
+Rest parameters are clearer, so you do not need the borrowing trick here. But you will still see patterns like:
+
+```js
+Object.prototype.toString.call(value);
+```
+
+This is useful because `toString` can reveal the internal type of a value without relying on `typeof` alone.
+
+## bind is for callbacks and partial application
+
+The most common use of `bind` is keeping a method connected to its object when it gets passed somewhere else:
+
+```js
+const button = {
+  label: "publish",
+  click() {
+    console.log(this.label);
+  },
+};
+
+setTimeout(button.click.bind(button), 1000);
+```
+
+`bind` also lets you pre-fill arguments:
+
+```js
+function multiply(a, b) {
+  return a * b;
+}
+
+const double = multiply.bind(null, 2);
+
+double(5); // 10
+```
+
+The `null` means "I do not care about `this` here". The `2` becomes the first argument permanently. This is called partial application: you make a smaller, more specific function from a larger one.
+
+An arrow function can do the same thing:
+
+```js
+const double = (n) => multiply(2, n);
+```
+
+Use whichever reads more clearly. `bind` is especially useful when the original function already expects `this`.
+
+## the trap: bind does not call
+
+This is the mistake to avoid:
+
+```js
+const helloAda = introduce.bind(ada, "hello");
+
+// nothing is logged yet
+```
+
+`bind` returned a function. If you never call it, nothing runs.
+
+```js
+helloAda("!"); // now it runs
+```
+
+Compare that with `call` and `apply`: they run immediately and return the function's result.
+
+## a real-world borrowed function
+
+Suppose you want to push into an array, but you only have the method itself:
+
+```js
+const push = Array.prototype.push;
+const numbers = [];
+
+push(1); // TypeError in strict mode
+```
+
+The extracted `push` has lost its array. Give it one explicitly:
+
+```js
+push.call(numbers, 1);
+push.call(numbers, 2);
+
+numbers; // [1, 2]
+```
+
+Of course, `numbers.push(1)` is simpler. The point is understanding what happened: the method needed a `this`, and extracting it removed the receiver.
+
+## when should you use which?
+
+- Use **call** when you know the arguments and want to run the function now.
+- Use **apply** when the arguments are already in an array and you want to run now.
+- Use **bind** when you want a function you can pass around later, or when you want to pre-fill arguments.
+- If you do not need to change `this`, a normal function or arrow function is usually clearer than any of the three.
+
+<Callout label="the short version">
+
+`call` and `apply` run a function with a chosen `this`. `bind` gives you a new function with that `this` already attached. Only `bind` is lazy.
+
+</Callout>
+
+If the previous sentence is still fuzzy, start with [how `this` is decided by the call site](/blog/this-is-decided-by-the-call-site). These three methods only make sense after that idea clicks.

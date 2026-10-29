@@ -1,0 +1,210 @@
+---
+title: "this is decided by the call site"
+description: "A practical mental model for JavaScript's this, starting from who calls the function instead of memorizing definitions."
+date: "2026-10-29"
+readingTime: "7 min read"
+---
+
+`this` looks like a special variable, but it behaves more like a hidden argument. The function body does not decide what `this` is. The way the function is called does.
+
+That one sentence removes most of the confusion. Instead of asking "what is `this` inside this function?", ask "who is calling this function?"
+
+<ThisBindingDiagram />
+
+## the same function, different callers
+
+Start with one object and one method:
+
+```js
+const user = {
+  name: "Ada",
+  greet() {
+    return `hello, ${this.name}`;
+  },
+};
+
+user.greet(); // "hello, Ada"
+```
+
+When you write `user.greet()`, JavaScript looks at `user` on the left of the dot and uses it as `this` inside `greet`.
+
+Now pull the function out of the object:
+
+```js
+const greet = user.greet;
+
+greet(); // TypeError: Cannot read properties of undefined (reading 'name')
+```
+
+The function body did not change. The call site did. `greet()` is a plain call, so there is no object on the left of the dot.
+
+In a modern module, a plain call gets `this === undefined`. In an old non-strict script, it may fall back to the global object. Either way, it is no longer `user`.
+
+## four common ways to set this
+
+There are four everyday call shapes. Once you recognize them, most `this` bugs stop being mysterious.
+
+### 1. A method call
+
+```js
+user.greet();
+```
+
+`this` is the object before the final dot.
+
+This also works through a deeper path:
+
+```js
+account.owner.greet();
+```
+
+Inside `greet`, `this` is `account.owner`, not `account`.
+
+### 2. A plain call
+
+```js
+greet();
+```
+
+There is no receiver. In strict mode, `this` is `undefined`. Do not build logic around the non-strict fallback; it hides bugs.
+
+### 3. A constructor
+
+```js
+function Person(name) {
+  this.name = name;
+}
+
+const ada = new Person("Ada");
+```
+
+With `new`, JavaScript creates a fresh object, uses it as `this`, and returns it. `this` is the new object, not the function and not the caller.
+
+### 4. An explicit receiver
+
+```js
+greet.call(user);
+greet.apply(user);
+const boundGreet = greet.bind(user);
+```
+
+`call`, `apply`, and `bind` let you choose `this` yourself. The next article covers them in detail.
+
+## arrow functions are the exception
+
+An arrow function does not get its own `this`. It looks outward to the surrounding function.
+
+```js
+const team = {
+  name: "design",
+  members: ["ada", "grace"],
+  list() {
+    return this.members.map((member) => `${this.name}: ${member}`);
+  },
+};
+
+team.list();
+// ["design: ada", "design: grace"]
+```
+
+The arrow function inside `map` uses the `this` from `list`, which is `team`.
+
+Replace the arrow with a normal function and the behavior changes:
+
+```js
+const team = {
+  name: "design",
+  members: ["ada", "grace"],
+  list() {
+    return this.members.map(function (member) {
+      return `${this.name}: ${member}`; // this is not team
+    });
+  },
+};
+```
+
+This is why arrow functions are so common in callbacks: they preserve the surrounding `this` without an extra variable or `bind`.
+
+## the detachment trap
+
+The most common `this` bug has nothing to do with classes. It happens when a method is passed somewhere else.
+
+```js
+const button = {
+  label: "publish",
+  click() {
+    console.log(this.label);
+  },
+};
+
+button.click(); // "publish"
+
+setTimeout(button.click, 1000);
+// this is no longer button
+```
+
+`setTimeout` receives the function, not the object it came from. By the time it runs, the call site is a plain call. Fix it by wrapping the call:
+
+```js
+setTimeout(() => button.click(), 1000);
+```
+
+Or by binding the method once:
+
+```js
+const click = button.click.bind(button);
+setTimeout(click, 1000);
+```
+
+The wrapper says "call this method on this object". The bound function says "remember this object for me".
+
+## classes are not magic
+
+Class methods live on the prototype, so they follow the same call-site rules:
+
+```js
+class Counter {
+  count = 0;
+
+  increment() {
+    this.count += 1;
+  }
+}
+
+const counter = new Counter();
+counter.increment(); // this = counter
+
+const increment = counter.increment;
+increment(); // this is undefined
+```
+
+There are two straightforward fixes. Bind in the constructor, or use an arrow class field when the method is meant to be passed around:
+
+```js
+class Counter {
+  count = 0;
+
+  increment = () => {
+    this.count += 1;
+  };
+}
+```
+
+Arrow class fields create a function per instance and capture that instance's `this`. That is useful for callbacks, but it uses a little more memory than a prototype method. Use it where detachment is expected, not everywhere by default.
+
+## a short checklist
+
+When `this` is not what you expect, check these in order:
+
+1. Is the function an arrow function? If yes, look one scope outward.
+2. How was it called: `obj.fn()`, `fn()`, `new fn()`, or `fn.call(...)`?
+3. Was the method detached and passed as a callback?
+4. Is the code running in strict mode? ES modules and class bodies are strict by default.
+
+<Callout label="the rule I use">
+
+Before asking "what is `this` inside the function?", ask "who is calling it?" If it is an arrow function, ask the same question one level up.
+
+</Callout>
+
+The next useful step is learning how to choose `this` on purpose. That is exactly what [call, apply, and bind](/blog/call-apply-bind-the-same-job-in-three-shapes) are for.
